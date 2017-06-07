@@ -43,7 +43,7 @@ except:
     pass
 
 # Load dataset and generate splits
-dat = skd.load_breast_cancer()
+dat = skd.load_digits()
 
 # This is all rather inefficient, lots of data duplication esp. for k-fold, 
 # but for medium sized dataset should not be a problem

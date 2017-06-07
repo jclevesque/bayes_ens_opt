@@ -42,7 +42,7 @@ except:
     pass
 
 # Load dataset and generate splits
-dat = skd.load_breast_cancer()
+dat = skd.load_digits()
 
 # This is all rather inefficient, lots of data duplication esp. for k-fold, 
 # but for medium sized dataset should not be a problem
@@ -60,8 +60,10 @@ D['val_data'] = [val_data]
 D['val_labels'] = [val_labels]
 
 # define a search space
-search_params = [{'name':'C', 'type':'float', 'scale':'log', 
-    'min':-5, 'max':5, 'size':1}] 
+search_params = [
+    {'name':'C', 'type':'float', 'scale':'log', 'min':-5, 'max':5, 'size':1},
+    {'name':'gamma', 'type':'float', 'scale':'log', 'min':-5, 'max':5, 'size':1}
+] 
 search_space = beo_space.SearchSpace(search_params)
 
 # Parameters for the evaluation of the models, i.e. training model and

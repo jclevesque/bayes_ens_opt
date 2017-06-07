@@ -35,10 +35,6 @@ class Job:
         self.proc_id = proc_id
         self.result = None
 
-        # Other potential fields:
-        # - job_crashed / launched an exception
-        # - extra output, provided by the job runner (i.e. train/val/test err)
-
 
 class BaseExperiment:
     def __init__(self, expt_dir, search_space, init=False):
@@ -104,10 +100,6 @@ class BaseExperiment:
     def get_broken(self):
         return np.nonzero(self.get_jobs_status() == BROKEN_STATE)[0]
 
-    # def get_dict_params(self, x):
-    #     raise NotImplementedError("Get params should be implemented by the top"
-    #     " level Experiment class")
-
     def get_best(self):
         status = self.get_jobs_status()
         complete = np.nonzero(status == COMPLETE_STATE)[0]
@@ -123,14 +115,6 @@ class BaseExperiment:
         return self.jobs[jid].proc_id
 
     def add_job(self, x):
-        # Checks to prevent numerical over/underflow from corrupting the grid
-        # x[x > 1.0] = 1.0
-        # x[x < 0.0] = 0.0
-
-        # get rid of inactive params to illustrate independence of parameters
-        # if self.impute_inactive:
-        #     x = self.impute_inactive_values(x)
-
         job = Job(x)
         self.jobs.append(job)
 
@@ -158,15 +142,6 @@ class BaseExperiment:
     def set_broken(self, jid):
         self.jobs[jid].status = BROKEN_STATE
 
-    # def get_candidates(self, n=None):
-    #     '''
-    #      Get uninformed candidate solutions to evaluate with the chooser.
-    #       Choooser should perform a local optimization of acquisition function
-    #       on top of the candidates evaluated.
-    #     '''
-    #     raise NotImplemented("Experiment class should redefine the"
-    #     " get_candidates function.")
-
     def _load(self):
         fh = bz2.BZ2File(self.pkl, 'rb')
         saved_dict = pickle.load(fh)
@@ -179,14 +154,11 @@ class BaseExperiment:
 
     def _save(self):
         self.nsave = self.get('nsave', 0) + 1
-        logging.info("Saved smbo_expt %i times." % self.nsave)
 
-        # fh = bz2.BZ2File(self.pkl, 'wb')
-        # don't save/load locker/job_pkl or things get ugly
+        # don't save/load locker/job_pkl or problems arise
         tosave = {k: v for k, v in self.__dict__.items()
                   if k not in SKIP_SAVE_LOAD}
-        # pickle.dump(tosave, fh)
-        # fh.close()
+
         ufile.safe_save_pickle(tosave, self.pkl)
 
 Experiment = BaseExperiment
